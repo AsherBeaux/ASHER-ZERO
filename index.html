@@ -116,11 +116,11 @@
             const form = document.querySelector('.email-form');
             const downloadMessage = document.getElementById('download-message');
             
-            // Define download URLs
-            const downloadUrls = {
-                'asher-bass': 'https://www.dropbox.com/scl/fo/crcmcytk86edy8c2lbh0h/AGtwRm_SEWrnzNm-3B1vNfs?rlkey=o1gignbgrpnckqko229s3vplq&dl=1',
-                'zero-drum': 'https://www.dropbox.com/scl/fo/7hadb4ag0ignxofy510j1/ALqc7-8MSSG9nhKid0aeN54?rlkey=c85q8y2cppoqgkwxjabq6b4z6&dl=1',
-                'starter-kit': 'https://www.dropbox.com/scl/fo/gd4u5wrhnxt6rn5hddey1/AAbOnf9Xz_dsYMzuMSU9iL4?rlkey=rvf646ifm4bl82jdcx8pe8pn5&dl=1'
+            // Define download paths for each pack
+            const downloadPaths = {
+                'asher-bass': '/downloads/asher-bass-pack.zip',
+                'zero-drum': '/downloads/zero-drum-pack.zip',
+                'starter-kit': '/downloads/starter-kit.zip'
             };
 
             // Handle form submission
@@ -158,39 +158,19 @@
                         });
                         
                         // If it's a pack download, trigger it after successful form submission
-                        if (downloadUrls[packType]) {
+                        if (downloadPaths[packType]) {
                             // Show download message
                             downloadMessage.textContent = `Starting download: ${packType.replace('-', ' ').toUpperCase()}...`;
                             
                             // Small delay to ensure form submission is processed
                             setTimeout(() => {
-                                const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
-                                const url = downloadUrls[packType];
-                                
-                                if (isSafari) {
-                                    // For Safari, we need to use window.open with a small delay
-                                    const newWindow = window.open('', '_blank');
-                                    fetch(url)
-                                        .then(response => response.blob())
-                                        .then(blob => {
-                                            const blobUrl = window.URL.createObjectURL(blob);
-                                            newWindow.location.href = blobUrl;
-                                            // Clean up the object URL after the download starts
-                                            setTimeout(() => window.URL.revokeObjectURL(blobUrl), 100);
-                                        })
-                                        .catch(() => {
-                                            // If fetch fails, fall back to opening the URL directly
-                                            newWindow.location.href = url;
-                                        });
-                                } else {
-                                    // For Chrome and other browsers, use the standard approach
-                                    const link = document.createElement('a');
-                                    link.href = url;
-                                    link.target = '_blank';
-                                    document.body.appendChild(link);
-                                    link.click();
-                                    document.body.removeChild(link);
-                                }
+                                const url = downloadPaths[packType];
+                                const link = document.createElement('a');
+                                link.href = url;
+                                link.download = url.split('/').pop(); // This will force download instead of opening
+                                document.body.appendChild(link);
+                                link.click();
+                                document.body.removeChild(link);
                                 
                                 // Update message
                                 downloadMessage.textContent = 'Download started! Check your downloads folder.';
