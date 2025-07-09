@@ -9,6 +9,9 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link rel="icon" href="AZ-LOGO-GRAY.png" type="image/png">
+    <style>
+        /* Form notes styling will be in the external CSS */
+    </style>
 </head>
 <body style="margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background-color: #000000; background-image: url('images/az-week-1-background-image.png'); background-size: cover; background-position: center; background-repeat: no-repeat;">
     <!-- Background Overlay -->
@@ -42,19 +45,35 @@
                             <input type="text" name="name" placeholder="Artist Name" required>
                         </div>
                         <div class="form-group">
-                            <input type="email" name="email" placeholder="Artist Email" required>
+                            <div class="form-input-container">
+                                <input type="email" name="email" placeholder="Artist Email" required>
+                            </div>
+                        </div>
+                        <div class="comment-box email-comment">
+                            <div class="comment-arrow"></div>
+                            <div class="comment-content">
+                                <span class="note-emoji">🤞</span>
+                                <span class="note-text">ultra super pinky promise we wont sell ur email. We just wanna know who's here!</span>
+                            </div>
                         </div>
                         <div class="button-group">
                             <button type="submit" class="button asher" name="pack" value="asher-bass">
-                                <span class="button-icon">ASHER BASS 'WEIGHT' PACK
+                                <span class="button-icon">ASHER BASS 'WEIGHT' PACK</span>
                             </button>
                             <button type="submit" class="button zero" name="pack" value="zero-drum">
-                                <span class="button-icon">ZERO DRUM 'WEIGHT' PACK
+                                <span class="button-icon">ZERO DRUM 'WEIGHT' PACK</span>
                             </button>
+                        </div>
+                        <div class="comment-box download-comment">
+                            <div class="comment-arrow"></div>
+                            <div class="comment-content">
+                                <span class="note-emoji">⬇️</span>
+                                <span class="note-text">when u input ur email It's gonna auto download, no need to go anywhere.</span>
+                            </div>
                         </div>
                         <div class="button-group">
                             <button type="submit" class="button starter-kit" name="pack" value="starter-kit">
-                                <span class="button-icon">🎁 DOWNLOAD STARTER KIT
+                                <span class="button-icon">🎁 DOWNLOAD STARTER KIT</span>
                             </button>
                         </div>
                     </form>
@@ -83,7 +102,9 @@
     <script src="https://tally.so/widgets/embed.js"></script>
     <script src="js/countdown.js"></script>
     <script>
+        console.log('JavaScript is running!');
         document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM fully loaded');
             const form = document.querySelector('.email-form');
             const downloadMessage = document.getElementById('download-message');
             
