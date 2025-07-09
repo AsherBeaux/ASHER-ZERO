@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Redirecting to Download...</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            text-align: center;
+            margin-top: 100px;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Hold tight — your download is starting...</h1>
+    <script>
+        const fileMap = {
+            "asher-bass": "https://www.dropbox.com/scl/fo/crcmcytk86edy8c2lbh0h/AGtwRm_SEWrnzNm-3B1vNfs?rlkey=o1gignbgrpnckqko229s3vplq&dl=1",
+            "zero-drum": "https://www.dropbox.com/scl/fo/7hadb4ag0ignxofy510j1/ALqc7-8MSSG9nhKid0aeN54?rlkey=c85q8y2cppoqgkwxjabq6b4z6&dl=1",
+            "starter-kit": "https://www.dropbox.com/scl/fo/gd4u5wrhnxt6rn5hddey1/AAbOnf9Xz_dsYMzuMSU9iL4?rlkey=rvf646ifm4bl82jdcx8pe8pn5&dl=1"
+        };
+
+        const params = new URLSearchParams(window.location.search);
+        const fileKey = params.get("file");
+
+        if (fileKey && fileMap[fileKey]) {
+            window.location.href = fileMap[fileKey];
+        } else {
+            document.body.innerHTML = "<h1>Error: Download not found.</h1>";
+        }
+    </script>
+</body>
+
+</html>

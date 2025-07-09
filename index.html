@@ -164,13 +164,8 @@
                             
                             // Small delay to ensure form submission is processed
                             setTimeout(() => {
-                                const url = downloadPaths[packType];
-                                const link = document.createElement('a');
-                                link.href = url;
-                                link.download = url.split('/').pop(); // This will force download instead of opening
-                                document.body.appendChild(link);
-                                link.click();
-                                document.body.removeChild(link);
+                                // Redirect to download.html with the correct Dropbox key
+                                window.location.href = `/download.html?file=${packType}`;
                                 
                                 // Update message
                                 downloadMessage.textContent = 'Download started! Check your downloads folder.';
