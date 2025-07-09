@@ -164,13 +164,33 @@
                             
                             // Small delay to ensure form submission is processed
                             setTimeout(() => {
-                                // Start the download (open in new tab)
-                                const link = document.createElement('a');
-                                link.href = downloadUrls[packType];
-                                link.target = "_blank";
-                                document.body.appendChild(link);
-                                link.click();
-                                document.body.removeChild(link);
+                                const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+                                const url = downloadUrls[packType];
+                                
+                                if (isSafari) {
+                                    // For Safari, we need to use window.open with a small delay
+                                    const newWindow = window.open('', '_blank');
+                                    fetch(url)
+                                        .then(response => response.blob())
+                                        .then(blob => {
+                                            const blobUrl = window.URL.createObjectURL(blob);
+                                            newWindow.location.href = blobUrl;
+                                            // Clean up the object URL after the download starts
+                                            setTimeout(() => window.URL.revokeObjectURL(blobUrl), 100);
+                                        })
+                                        .catch(() => {
+                                            // If fetch fails, fall back to opening the URL directly
+                                            newWindow.location.href = url;
+                                        });
+                                } else {
+                                    // For Chrome and other browsers, use the standard approach
+                                    const link = document.createElement('a');
+                                    link.href = url;
+                                    link.target = '_blank';
+                                    document.body.appendChild(link);
+                                    link.click();
+                                    document.body.removeChild(link);
+                                }
                                 
                                 // Update message
                                 downloadMessage.textContent = 'Download started! Check your downloads folder.';
