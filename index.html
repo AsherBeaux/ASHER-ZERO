@@ -39,7 +39,7 @@
                     </span>
                 </div>
                 <div class="tally-form">
-                    <form class="email-form" action="https://formspree.io/f/xvgrjvja" method="POST" target="_blank">
+                    <form class="email-form" action="https://formspree.io/f/xvgrjvja" method="POST">
                         <input type="hidden" name="_captcha" value="false">
                         <div class="form-group">
                             <input type="text" name="name" placeholder="Artist Name" required>
@@ -168,6 +168,9 @@
             // Handle form submission
             if (form) {
                 form.addEventListener('submit', async function(e) {
+                    console.log('Form submit intercepted');
+                    e.preventDefault();
+                    console.log('e.preventDefault() called');
                     e.preventDefault();
                     // Open popup immediately to satisfy Safari's user-gesture requirement
                     const popup = window.open('', '_blank', 'width=600,height=400');
