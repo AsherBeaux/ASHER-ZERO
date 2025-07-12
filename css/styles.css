@@ -815,16 +815,43 @@ h1::after {
 /* Mobile scrollable left-column */
 @media (max-width: 600px) {
   .left-column {
+    position: fixed;
+    inset: 0;
+    height: 100vh;
     max-height: 100vh;
-    overflow-y: auto;
     width: 75vw;
     margin: 0 auto;
+    overflow-y: auto;
     box-sizing: border-box;
-    padding: 16px 8px;
-    left: 0;
-    top: 0;
-    transform: none;
+    padding: 16px 8px 70px 8px; /* extra bottom padding for Discord button */
     border-radius: 0;
+    z-index: 10;
+  }
+  .discord-fixed-mobile {
+    display: none;
+  }
+  @media (max-width: 600px) {
+    .discord-fixed-mobile {
+      display: block;
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      width: 100vw;
+      z-index: 100;
+      border-radius: 0;
+      background: #5865f2;
+      color: #fff;
+      font-size: 1.2rem;
+      font-weight: 600;
+      text-align: center;
+      padding: 18px 0 18px 0;
+      box-shadow: 0 -2px 16px rgba(0,0,0,0.2);
+      text-decoration: none;
+    }
+    .left-column {
+      padding-bottom: 90px;
+    }
   }
   .section {
     padding: 0;
