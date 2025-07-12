@@ -1,0 +1,133 @@
+From 0000000 Mon Jan  1 00:00:00 0000
+From: Codex Patch <you@example.com>
+Date: Fri, 11 Jul 2025 21:00:00 -0500
+Subject: [PATCH] Bring in Codex’s refactor: external JS, Tally embed, Discord CTA, netlify.toml
+
+---
+ index.html                      |  38 ++++++++++++++++++++++-----------------
+ css/styles.css                  |   9 +++++++++
+ js/countdown.js (new file)      |  35 +++++++++++++++++++++++++++++++++++
+ js/site.js (new file)           |  15 +++++++++++++++
+ netlify.toml (new file)         |   8 ++++++++
+ 5 files changed, 95 insertions(+), 8 deletions(-)
+ create mode 100644 js/countdown.js
+ create mode 100644 js/site.js
+ create mode 100644 netlify.toml
+
+diff --git a/index.html b/index.html
+index 1234567..89abcde 100644
+--- a/index.html
++++ b/index.html
+@@ -30,10 +30,16 @@
+-    <h1>AZ WEEK #1 DROP</h1>
++    <h1>AZ WEEK #<span id="week-number">1</span> DROP</h1>
+@@ -40,7 +46,8 @@
+-                <div class="tally-form">
+-                    <!-- old Formspree form removed -->
+-                </div>
++                <div class="tally-form">
++                    <div class="tally-embed" data-tally-layout="modal"
++                         data-tally-emoji-text="ultra super pinky promise we won’t sell ur email"
++                         data-tally-modal-text="Enter your email for the weekly drop"
++                         data-tally-src="https://tally.so/embed/YOUR_FORM_ID?alignLeft=1"></div>
++                </div>
+diff --git a/css/styles.css b/css/styles.css
+index abcdef0..1234567 100644
+--- a/css/styles.css
++++ b/css/styles.css
+@@ (end-of-file)
++.discord-cta {
++  position: fixed;
++  top: 50%;
++  right: 2rem;
++  transform: translateY(-50%);
++  padding: 0.6rem 1rem;
++  background: #5865F2;
++  color: #fff;
++  text-decoration: none;
++  border-radius: 9999px;
++  font-size: 0.8rem;
++  font-weight: 600;
++  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
++  transition: transform 0.2s ease;
++  z-index: 20;
++}
++.discord-cta:hover {
++  transform: translateY(-50%) scale(1.05);
++}
+diff --git a/js/countdown.js b/js/countdown.js
+new file mode 100644
+index 0000000..fedcba9
+--- /dev/null
++++ b/js/countdown.js
+@@ -0,0 +1,35 @@
++(function() {
++  function updateCountdown() {
++    const now = new Date();
++    const target = new Date();
++
++    const daysUntilFriday = (5 - now.getDay() + 7) % 7;
++    target.setDate(now.getDate() + (daysUntilFriday || 7));
++    target.setHours(17, 0, 0, 0);
++
++    if (now.getDay() === 5 && now.getHours() >= 17) {
++      target.setDate(target.getDate() + 7);
++    }
++
++    const diff = target - now;
++
++    if (diff <= 0) {
++      document.getElementById('countdown').innerHTML = 'Available now!';
++      return;
++    }
++
++    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
++    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
++    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
++    const seconds = Math.floor((diff % (1000 * 60)) / 1000);
++
++    document.getElementById('days').textContent = days + 'd ';
++    document.getElementById('hours').textContent = hours + 'h ';
++    document.getElementById('minutes').textContent = minutes + 'm ';
++    document.getElementById('seconds').textContent = seconds + 's';
++  }
++
++  updateCountdown();
++  window.updateCountdown = updateCountdown;
++  window.countdownInterval = setInterval(updateCountdown, 1000);
++})();
+diff --git a/js/site.js b/js/site.js
+new file mode 100644
+index 0000000..abcdef9
+--- /dev/null
++++ b/js/site.js
+@@ -0,0 +1,15 @@
++document.addEventListener('DOMContentLoaded', () => {
++  const params = new URLSearchParams(window.location.search);
++  const week = params.get('week') || '1';
++  const weekEl = document.getElementById('week-number');
++  if (weekEl) weekEl.textContent = week;
++
++  if (window.Tally) {
++    Tally.on('submit', data => {
++      const pack = data.response.pack;
++      window.location.href = `/download.html?file=${pack}`;
++    });
++  }
++});
+diff --git a/netlify.toml b/netlify.toml
+new file mode 100644
+index 0000000..1234abc
+--- /dev/null
++++ b/netlify.toml
+@@ -0,0 +1,8 @@
++[build]
++  publish = "."
++  command = ""
++[[headers]]
++  for = "/downloads/*"
++  [headers.values]
++    Content-Type = "application/zip"
++    Content-Disposition = "attachment"
+-- 
+1.9.1
