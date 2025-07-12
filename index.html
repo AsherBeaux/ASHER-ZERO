@@ -275,82 +275,49 @@
                                 link.click();
                                 setTimeout(() => document.body.removeChild(link), 100);
                             } else {
-                                // For the popup, write a simple HTML that triggers the download
-                                // Write to popup with security headers
-                                popup.document.write(`
-                                    <!DOCTYPE html>
-                                    <html>
-                                    <head>
-                                        <meta charset="UTF-8">
-                                        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                                        <title>Downloading...</title>
-                                        <script>
-                                            window.onload = function() {
-                                                // Prevent XSS
-                                                document.documentElement.contentEditable = false;
-                                                document.body.contentEditable = false;
-                                                
-                                                // Write download link with sanitized URL
-                                                const link = document.createElement('a');
-                                                link.href = '${encodeURIComponent(url)}';
-                                                link.download = '${encodeURIComponent(url.split('/').pop())}';
-                                                link.style.display = 'none';
-                                                document.body.appendChild(link);
-                                                link.click();
-                                                
-                                                // Add user-friendly message
-                                                const message = document.createElement('p');
-                                                message.textContent = 'Starting download...';
-                                                document.body.appendChild(message);
-                                                
-                                                // Add fallback link
-                                                const fallback = document.createElement('p');
-                                                fallback.innerHTML = 'If the download doesn\'t start, <a href="${encodeURIComponent(url)}" download>click here</a>.';
-                                                document.body.appendChild(fallback);
-                                                
-                                                // Close after 1.5 seconds
-                                                setTimeout(function() {
-                                                    window.close();
-                                                }, 1500);
-                                            };
-                                        </script>
-                                        <style>
-                                            body {
-                                                margin: 20px;
-                                                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-                                            }
-                                            p {
-                                                margin: 10px 0;
-                                            }
-                                            a {
-                                                color: #5865F2;
-                                                text-decoration: none;
-                                            }
-                                            a:hover {
-                                                text-decoration: underline;
-                                            }
-                                        </style>
-                                    </head>
-                                    <body>
-                                    </body>
-                                    </html>
-                                `);
-                                                document.getElementById('real-download').click();
-                                                setTimeout(function() {
-                                                    window.close();
-                                                }, 1500);
-                                            };
-                                        </script>
-                                    </head>
-                                    <body>
-                                        <p>Starting download...</p>
-                                        <p>If the download doesn't start, <a href="${url}" download>click here</a>.</p>
-                                        <a id="real-download" href="${url}" download style="display: none;">Download</a>
-                                    </body>
-                                    </html>
-                                `);
-                                popup.document.close();
-                            }
+                                // Encapsulate popup logic in a function to prevent leaking template
+                                function openDownloadPopup(url) {
+                                    const popupTemplate = `<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='UTF-8'>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+    <title>Downloading...</title>
+    <style>
+        body { margin: 20px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif; }
+        p { margin: 10px 0; }
+        a { color: #5865F2; text-decoration: none; }
+        a:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <p>Starting download...</p>
+    <p id='download-link'></p>
+    <script>
+        document.documentElement.contentEditable = false;
+        document.body.contentEditable = false;
+        var url = window.opener ? window.opener.popupDownloadUrl : '';
+        if (!url) {
+            url = decodeURIComponent(window.location.hash.slice(1));
+        }
+        var downloadLink = document.createElement('a');
+        downloadLink.href = url;
+        downloadLink.download = url.split('/').pop();
+        downloadLink.style.display = 'none';
+        document.body.appendChild(downloadLink);
+        downloadLink.click();
+        var fallbackLink = document.getElementById('download-link');
+        fallbackLink.innerHTML = 'If the download doesn\'t start, <a href="' + url + '" download>click here</a>.';
+        setTimeout(function() { window.close(); }, 1500);
+    <\/script>
+</body>
+</html>`;
+                                    popup.document.write(popupTemplate);
+                                    popup.document.close();
+                                }
+                                window.popupDownloadUrl = url;
+                                openDownloadPopup(url);
+
 
                             // Update message
                             downloadMessage.textContent = 'Download started! Check your downloads folder.';
