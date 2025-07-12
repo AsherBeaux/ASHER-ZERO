@@ -68,3 +68,4 @@ asher-zero/
 - Form handling by [Tally](https://tally.so)
 - File hosting on Dropbox
 - Font: Inter by Google Fonts
+
