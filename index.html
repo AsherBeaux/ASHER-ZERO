@@ -164,8 +164,42 @@
                             
                             // Small delay to ensure form submission is processed
                             setTimeout(() => {
-                                // Redirect to download.html with the correct Dropbox key
-                                window.location.href = `/download.html?file=${packType}`;
+                                const url = downloadPaths[packType];
+                                const popup = window.open('', '_blank', 'width=100,height=100,left=0,top=0');
+                                
+                                if (!popup || popup.closed || typeof popup.closed === 'undefined') {
+                                    // If popup was blocked, fall back to direct download
+                                    const link = document.createElement('a');
+                                    link.href = url;
+                                    link.style.display = 'none';
+                                    document.body.appendChild(link);
+                                    link.click();
+                                    setTimeout(() => document.body.removeChild(link), 100);
+                                } else {
+                                    // For the popup, write a simple HTML that triggers the download
+                                    popup.document.write(`
+                                        <!DOCTYPE html>
+                                        <html>
+                                        <head>
+                                            <title>Downloading...</title>
+                                            <script>
+                                                window.onload = function() {
+                                                    document.getElementById('real-download').click();
+                                                    setTimeout(function() {
+                                                        window.close();
+                                                    }, 1500);
+                                                };
+                                            </script>
+                                        </head>
+                                        <body>
+                                            <p>Starting download...</p>
+                                            <p>If the download doesn't start, <a href="${url}" download>click here</a>.</p>
+                                            <a id="real-download" href="${url}" download style="display: none;">Download</a>
+                                        </body>
+                                        </html>
+                                    `);
+                                    popup.document.close();
+                                }
                                 
                                 // Update message
                                 downloadMessage.textContent = 'Download started! Check your downloads folder.';
