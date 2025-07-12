@@ -817,7 +817,8 @@ h1::after {
   .left-column {
     max-height: 100vh;
     overflow-y: auto;
-    width: 100vw;
+    width: 75vw;
+    margin: 0 auto;
     box-sizing: border-box;
     padding: 16px 8px;
     left: 0;
