@@ -113,112 +113,87 @@
         document.addEventListener('DOMContentLoaded', () => {
             console.log('Form handler attached');
             const form = document.querySelector('.email-form');
-            form.addEventListener('submit', async (e) => {
-                console.log('Form submit intercepted');
-                e.preventDefault();
-                const submitButton = document.activeElement;
-                const packType = submitButton ? submitButton.value : '';
-                const nameInput = form.querySelector('input[name="name"]');
-                const emailInput = form.querySelector('input[name="email"]');
-                const downloadMessage = document.getElementById('download-message');
+            // Intercept all button clicks to handle submission and download fully in JS
+            const packButtons = form.querySelectorAll('button[name="pack"]');
+            packButtons.forEach((button) => {
+                button.addEventListener('click', async (e) => {
+                    e.preventDefault();
+                    const packType = button.value;
+                    const nameInput = form.querySelector('input[name="name"]');
+                    const emailInput = form.querySelector('input[name="email"]');
+                    const downloadMessage = document.getElementById('download-message');
 
-                // Input validation
-                const name = nameInput.value.trim();
-                const email = emailInput.value.trim();
-                
-                if (!name || !email) {
-                    downloadMessage.textContent = 'Please enter your name and email.';
-                    downloadMessage.style.display = 'block';
-                    downloadMessage.style.opacity = '1';
-                    return;
-                }
-
-                // Email validation
-                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-                if (!emailRegex.test(email)) {
-                    downloadMessage.textContent = 'Please enter a valid email address.';
-                    downloadMessage.style.display = 'block';
-                    downloadMessage.style.opacity = '1';
-                    return;
-                }
-
-                // Show loading state
-                downloadMessage.textContent = 'Processing...';
-                downloadMessage.style.display = 'block';
-                downloadMessage.style.opacity = '1';
-
-                try {
-                    const response = await fetch(form.action, {
-                        method: 'POST',
-                        body: new URLSearchParams({
-                            'name': nameInput.value.trim(),
-                            'email': emailInput.value.trim(),
-                            'pack': packType,
-                            '_subject': `New Download: ${packType.replace('-', ' ').toUpperCase()}`
-                        }),
-                        headers: {
-                            'Accept': 'application/json'
-                        }
-                    });
-
-                    // Ensure submission succeeded before triggering download
-                    if (!response.ok) {
-                        const errorText = await response.text();
-                        console.error('Form submission failed:', {
-                            status: response.status,
-                            statusText: response.statusText,
-                            error: errorText
-                        });
-                        
-                        let errorMessage = 'Error processing your request:';
-                        try {
-                            const errorJson = JSON.parse(errorText);
-                            errorMessage += ` ${errorJson.message || errorJson.error || ''}`;
-                        } catch (e) {
-                            errorMessage += ' Please try again.';
-                        }
-                        
-                        downloadMessage.textContent = errorMessage;
+                    // Input validation
+                    const name = nameInput.value.trim();
+                    const email = emailInput.value.trim();
+                    if (!name || !email) {
+                        downloadMessage.textContent = 'Please enter your name and email.';
                         downloadMessage.style.display = 'block';
                         downloadMessage.style.opacity = '1';
                         return;
                     }
-
-                    // If it's a pack download, trigger it after successful form submission
-                    const staticDownloadPaths = {
-                        'asher-bass': '/downloads/asher-bass-pack.zip',
-                        'zero-drum': '/downloads/zero-drum-pack.zip',
-                        'starter-kit': '/downloads/starter-kit.zip'
-                    };
-
-                    if (staticDownloadPaths[packType]) {
-                        // Show thank you message
-                        downloadMessage.textContent = "Thanks for downloading! Come hang on discord!";
+                    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                    if (!emailRegex.test(email)) {
+                        downloadMessage.textContent = 'Please enter a valid email address.';
                         downloadMessage.style.display = 'block';
                         downloadMessage.style.opacity = '1';
+                        return;
+                    }
+                    downloadMessage.textContent = 'Processing...';
+                    downloadMessage.style.display = 'block';
+                    downloadMessage.style.opacity = '1';
 
-                        // Try to trigger download
-                        const link = document.createElement('a');
-                        link.href = staticDownloadPaths[packType];
-                        link.download = staticDownloadPaths[packType].split('/').pop();
-                        link.style.display = 'none';
-                        document.body.appendChild(link);
-                        link.click();
-                        setTimeout(() => document.body.removeChild(link), 100);
-                    } else {
-                        downloadMessage.textContent = 'Thank you! Download link unavailable.';
+                    // Submit to Formspree via AJAX
+                    try {
+                        const response = await fetch(form.action, {
+                            method: 'POST',
+                            body: new URLSearchParams({
+                                'name': name,
+                                'email': email,
+                                'pack': packType,
+                                '_subject': `New Download: ${packType.replace('-', ' ').toUpperCase()}`
+                            }),
+                            headers: { 'Accept': 'application/json' }
+                        });
+                        if (!response.ok) {
+                            downloadMessage.textContent = 'Error processing your request. Please try again.';
+                            downloadMessage.style.display = 'block';
+                            downloadMessage.style.opacity = '1';
+                            return;
+                        }
+                        // Show thank you and trigger download
+                        const staticDownloadPaths = {
+                            'asher-bass': '/downloads/asher-bass-pack.zip',
+                            'zero-drum': '/downloads/zero-drum-pack.zip',
+                            'starter-kit': '/downloads/starter-kit.zip'
+                        };
+                        if (staticDownloadPaths[packType]) {
+                            downloadMessage.textContent = "Thanks for downloading! Come hang on discord!";
+                            downloadMessage.style.display = 'block';
+                            downloadMessage.style.opacity = '1';
+                            const link = document.createElement('a');
+                            link.href = staticDownloadPaths[packType];
+                            link.download = staticDownloadPaths[packType].split('/').pop();
+                            link.style.display = 'none';
+                            document.body.appendChild(link);
+                            link.click();
+                            setTimeout(() => document.body.removeChild(link), 100);
+                        } else {
+                            downloadMessage.textContent = 'Thank you! Download link unavailable.';
+                            downloadMessage.style.display = 'block';
+                            downloadMessage.style.opacity = '1';
+                        }
+                    } catch (error) {
+                        downloadMessage.textContent = 'Error submitting form. Please try again.';
                         downloadMessage.style.display = 'block';
                         downloadMessage.style.opacity = '1';
                     }
-                    if (downloadPaths[packType]) {
-                        // Show download message
-                        downloadMessage.textContent = `Starting download: ${packType.replace('-', ' ').toUpperCase()}...`;
+                });
+            });
 
-                        const url = downloadPaths[packType];
-
-                        // Check if popups are supported before attempting
-                        if (!supportsPopups()) {
-                            // Fallback to direct download if popups aren't supported
+            // Remove the default submit event handler to prevent accidental fallback
+            form.addEventListener('submit', (e) => { e.preventDefault(); });
+        });
                             const link = document.createElement('a');
                             link.href = url;
                             link.download = url.split('/').pop();
