@@ -110,6 +110,48 @@
     </div>
     <script src="js/countdown.js"></script>
     <script>
+        // Error handling and logging
+        window.onerror = function(msg, url, line, col, error) {
+            console.error('Error:', {
+                message: msg,
+                url: url,
+                line: line,
+                column: col,
+                error: error
+            });
+            return false;
+        };
+
+        // Security headers
+        if (typeof CSP !== 'undefined') {
+            CSP.addPolicy('default-src', ['self']);
+            CSP.addPolicy('script-src', ['self', 'https://tally.so']);
+            CSP.addPolicy('img-src', ['self', 'data:']);
+            CSP.addPolicy('connect-src', ['self', 'https://tally.so']);
+        }
+
+        // Feature detection
+        const supportsPopups = () => {
+            try {
+                const popup = window.open('', '_blank');
+                if (!popup || popup.closed || typeof popup.closed === 'undefined') {
+                    return false;
+                }
+                popup.close();
+                return true;
+            } catch (e) {
+                return false;
+            }
+        };
+
+        // Input sanitization
+        const sanitizeInput = (input) => {
+            if (!input) return '';
+            return input
+                .replace(/[<>]/g, '')
+                .replace(/script/gi, '');
+        };
+
         console.log('JavaScript is running!');
         document.addEventListener('DOMContentLoaded', function() {
             console.log('DOM fully loaded');
@@ -135,8 +177,24 @@
                     const nameInput = form.querySelector('input[name="name"]');
                     const emailInput = form.querySelector('input[name="email"]');
 
-                    if (!nameInput.value.trim() || !emailInput.value.trim()) {
-                        return; // Don't proceed if required fields are empty
+                    // Input validation
+                    const name = nameInput.value.trim();
+                    const email = emailInput.value.trim();
+                    
+                    if (!name || !email) {
+                        downloadMessage.textContent = 'Please enter your name and email.';
+                        downloadMessage.style.display = 'block';
+                        downloadMessage.style.opacity = '1';
+                        return;
+                    }
+
+                    // Email validation
+                    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                    if (!emailRegex.test(email)) {
+                        downloadMessage.textContent = 'Please enter a valid email address.';
+                        downloadMessage.style.display = 'block';
+                        downloadMessage.style.opacity = '1';
+                        return;
                     }
 
                     // Show loading state
@@ -145,8 +203,14 @@
                     downloadMessage.style.opacity = '1';
 
                     try {
-                        // Submit to Formspree
-                        const response = await fetch(form.action, {
+                        // Submit to Formspree with retry logic
+                        let response;
+                        const maxRetries = 3;
+                        let retryCount = 0;
+                        
+                        while (retryCount < maxRetries) {
+                            try {
+                                response = await fetch(form.action, {
                             method: 'POST',
                             body: new URLSearchParams({
                                 'name': nameInput.value.trim(),
@@ -159,12 +223,28 @@
                             }
                         });
 
-                        // Ensure submission succeeded before triggering download
-                        if (!response.ok) {
-                            console.error('Form submission failed:', response);
-                            downloadMessage.textContent = 'Error processing your request. Please try again.';
-                            return;
-                        }
+                            // Ensure submission succeeded before triggering download
+                            if (!response.ok) {
+                                const errorText = await response.text();
+                                console.error('Form submission failed:', {
+                                    status: response.status,
+                                    statusText: response.statusText,
+                                    error: errorText
+                                });
+                                
+                                let errorMessage = 'Error processing your request:';
+                                try {
+                                    const errorJson = JSON.parse(errorText);
+                                    errorMessage += ` ${errorJson.message || errorJson.error || ''}`;
+                                } catch (e) {
+                                    errorMessage += ' Please try again.';
+                                }
+                                
+                                downloadMessage.textContent = errorMessage;
+                                downloadMessage.style.display = 'block';
+                                downloadMessage.style.opacity = '1';
+                                return;
+                            }
 
                         // If it's a pack download, trigger it after successful form submission
                         if (downloadPaths[packType]) {
@@ -172,6 +252,19 @@
                             downloadMessage.textContent = `Starting download: ${packType.replace('-', ' ').toUpperCase()}...`;
 
                             const url = downloadPaths[packType];
+
+                            // Check if popups are supported before attempting
+                            if (!supportsPopups()) {
+                                // Fallback to direct download if popups aren't supported
+                                const link = document.createElement('a');
+                                link.href = url;
+                                link.download = url.split('/').pop();
+                                link.style.display = 'none';
+                                document.body.appendChild(link);
+                                link.click();
+                                setTimeout(() => document.body.removeChild(link), 100);
+                                return;
+                            }
 
                             if (!popup || popup.closed || typeof popup.closed === 'undefined') {
                                 // If popup was blocked, fall back to direct download
@@ -183,13 +276,65 @@
                                 setTimeout(() => document.body.removeChild(link), 100);
                             } else {
                                 // For the popup, write a simple HTML that triggers the download
+                                // Write to popup with security headers
                                 popup.document.write(`
                                     <!DOCTYPE html>
                                     <html>
                                     <head>
+                                        <meta charset="UTF-8">
+                                        <meta name="viewport" content="width=device-width, initial-scale=1.0">
                                         <title>Downloading...</title>
                                         <script>
                                             window.onload = function() {
+                                                // Prevent XSS
+                                                document.documentElement.contentEditable = false;
+                                                document.body.contentEditable = false;
+                                                
+                                                // Write download link with sanitized URL
+                                                const link = document.createElement('a');
+                                                link.href = '${encodeURIComponent(url)}';
+                                                link.download = '${encodeURIComponent(url.split('/').pop())}';
+                                                link.style.display = 'none';
+                                                document.body.appendChild(link);
+                                                link.click();
+                                                
+                                                // Add user-friendly message
+                                                const message = document.createElement('p');
+                                                message.textContent = 'Starting download...';
+                                                document.body.appendChild(message);
+                                                
+                                                // Add fallback link
+                                                const fallback = document.createElement('p');
+                                                fallback.innerHTML = 'If the download doesn\'t start, <a href="${encodeURIComponent(url)}" download>click here</a>.';
+                                                document.body.appendChild(fallback);
+                                                
+                                                // Close after 1.5 seconds
+                                                setTimeout(function() {
+                                                    window.close();
+                                                }, 1500);
+                                            };
+                                        </script>
+                                        <style>
+                                            body {
+                                                margin: 20px;
+                                                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+                                            }
+                                            p {
+                                                margin: 10px 0;
+                                            }
+                                            a {
+                                                color: #5865F2;
+                                                text-decoration: none;
+                                            }
+                                            a:hover {
+                                                text-decoration: underline;
+                                            }
+                                        </style>
+                                    </head>
+                                    <body>
+                                    </body>
+                                    </html>
+                                `);
                                                 document.getElementById('real-download').click();
                                                 setTimeout(function() {
                                                     window.close();
