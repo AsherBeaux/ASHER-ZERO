@@ -838,19 +838,30 @@ h1::after {
       right: 0;
       bottom: 0;
       width: 100vw;
+      max-width: 420px;
+      margin: 0 auto 0 auto;
       z-index: 100;
-      border-radius: 0;
-      background: #5865f2;
+      border-radius: 8px 8px 0 0;
+      background: linear-gradient(90deg, #5865f2 60%, #404eed 100%);
       color: #fff;
-      font-size: 1.2rem;
+      font-size: 1.13rem;
       font-weight: 600;
       text-align: center;
-      padding: 18px 0 18px 0;
-      box-shadow: 0 -2px 16px rgba(0,0,0,0.2);
+      padding: 14px 0 14px 0;
+      box-shadow: 0 -2px 16px rgba(0,0,0,0.22);
+      text-decoration: none;
+      border: none;
+      transition: background 0.2s, box-shadow 0.2s;
+      outline: none;
+    }
+    .discord-fixed-mobile:hover, .discord-fixed-mobile:focus {
+      background: linear-gradient(90deg, #404eed 60%, #5865f2 100%);
+      color: #fff;
+      box-shadow: 0 -4px 28px rgba(0,0,0,0.28);
       text-decoration: none;
     }
     .left-column {
-      padding-bottom: 90px;
+      padding-bottom: 60px;
     }
   }
   .section {
