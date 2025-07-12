@@ -812,6 +812,32 @@ h1::after {
     }
 }
 
+/* Mobile scrollable left-column */
+@media (max-width: 600px) {
+  .left-column {
+    max-height: 100vh;
+    overflow-y: auto;
+    width: 100vw;
+    box-sizing: border-box;
+    padding: 16px 8px;
+    left: 0;
+    top: 0;
+    transform: none;
+    border-radius: 0;
+  }
+  .section {
+    padding: 0;
+  }
+  h1 {
+    font-size: 1.3rem;
+  }
+  .button-group button,
+  .button.starter-kit {
+    font-size: 1rem;
+    padding: 10px 8px;
+  }
+}
+
 /* Very small screens */
 @media (max-width: 360px) {
     .logo {

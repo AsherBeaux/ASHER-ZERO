@@ -205,5 +205,47 @@
             form.addEventListener('submit', (event) => { event.preventDefault(); });
         });
 </script>
+<script>
+// Countdown to next Friday at 12:00 PM CST (UTC-6, or UTC-5 during daylight saving)
+function getNextFridayNoonCST(now) {
+    // Convert 'now' to UTC
+    const utc = new Date(now.getTime() + now.getTimezoneOffset() * 60000);
+    // CST is UTC-6, but in summer CDT is UTC-5. We'll use US Central Time (Chicago) rules.
+    // Use Intl API for robust conversion.
+    const central = new Date(utc.toLocaleString('en-US', { timeZone: 'America/Chicago' }));
+    let target = new Date(central);
+    // 5 = Friday
+    const day = target.getDay();
+    const hour = target.getHours();
+    // Days until next Friday
+    let daysUntilFriday = (5 - day + 7) % 7;
+    // If today is Friday and past noon, go to next week
+    if (day === 5 && hour >= 12) daysUntilFriday = 7;
+    target.setDate(target.getDate() + daysUntilFriday);
+    target.setHours(12, 0, 0, 0); // 12:00 PM
+    // Convert back to UTC
+    const targetUTC = new Date(target.getTime() - target.getTimezoneOffset() * 60000);
+    return targetUTC;
+}
+function updateCountdown() {
+    const now = new Date();
+    const target = getNextFridayNoonCST(now);
+    const diff = target - now;
+    if (diff <= 0) {
+        document.getElementById('countdown').innerHTML = 'Available now!';
+        return;
+    }
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+    document.getElementById('days').textContent = days + 'd ';
+    document.getElementById('hours').textContent = hours + 'h ';
+    document.getElementById('minutes').textContent = minutes + 'm ';
+    document.getElementById('seconds').textContent = seconds + 's';
+}
+updateCountdown();
+setInterval(updateCountdown, 1000);
+</script>
 </body>
 </html>
