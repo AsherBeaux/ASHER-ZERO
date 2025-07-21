@@ -153,35 +153,57 @@
 
                     // Trigger download (user-initiated)
                     let fileName = '';
-                    if (packType === 'asher-bass') {
-                        fileName = '@AZ_ASHR_BASS."WEIGHT".zip';
-                    } else if (packType === 'zero-drum') {
-                        fileName = '@AZ_ZERO_DRUM."WEIGHT".zip';
-                    } else if (packType === 'starter-kit') {
-                        fileName = '@AZ_STARTER-KIT.zip';
-                    }
-                    if (fileName) {
-                        const fileUrl = `downloads/${encodeURIComponent(fileName)}`;
-                        
-                        // Handle Safari/iOS differently
-                        if (isSafari || isIOS) {
-                            // For Safari/iOS, we need to open in a new tab
-                            window.open(fileUrl, '_blank');
-                            downloadMessage.textContent = 'Your download has started in a new tab. If it doesn\'t work, please try again.';
-                        } else {
-                            // For other browsers, use the download attribute
-                            const link = document.createElement('a');
-                            link.href = fileUrl;
-                            link.download = fileName;
-                            link.style.display = 'none';
-                            document.body.appendChild(link);
-                            link.click();
-                            setTimeout(() => {
-                                document.body.removeChild(link);
-                                window.URL.revokeObjectURL(fileUrl);
-                            }, 100);
-                            downloadMessage.textContent = 'Your download should start shortly. If it doesn\'t, please check your email.';
+                    let displayName = '';
+                    
+                    // Define file mappings
+                    const fileMappings = {
+                        'asher-bass': {
+                            file: 'AZ_ASHR_BASS_WEIGHT.zip',
+                            display: 'ASHR BASS "WEIGHT" PACK'
+                        },
+                        'zero-drum': {
+                            file: 'AZ_ZERO_DRUM_WEIGHT.zip',
+                            display: 'ZERO DRUM "WEIGHT" PACK'
+                        },
+                        'starter-kit': {
+                            file: 'AZ_STARTER-KIT.zip',
+                            display: 'STARTER KIT'
                         }
+                    };
+                    
+                    const fileInfo = fileMappings[packType];
+                    
+                    if (fileInfo) {
+                        fileName = fileInfo.file;
+                        displayName = fileInfo.display;
+                        
+                        // Create the full URL to the file
+                        const fileUrl = `downloads/${fileName}`;
+                        
+                        // Create a temporary link for the download
+                        const link = document.createElement('a');
+                        link.href = fileUrl;
+                        link.download = displayName + '.zip';
+                        link.style.display = 'none';
+                        document.body.appendChild(link);
+                        
+                        // Try to trigger the download
+                        try {
+                            link.click();
+                            downloadMessage.textContent = 'Starting download...';
+                        } catch (err) {
+                            // If download fails, open in new tab as fallback
+                            window.open(fileUrl, '_blank');
+                            downloadMessage.textContent = 'Opening download in new tab...';
+                        }
+                        
+                        // Clean up
+                        setTimeout(() => {
+                            document.body.removeChild(link);
+                            window.URL.revokeObjectURL(fileUrl);
+                        }, 100);
+                        
+                        downloadMessage.textContent = 'Your download should start shortly. If it doesn\'t, please check your email.';
                         
                         downloadMessage.style.display = 'block';
                         downloadMessage.style.opacity = '1';
