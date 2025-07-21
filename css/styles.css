@@ -1,0 +1,999 @@
+/* Form Notes */
+
+/* Base Styles */
+:root {
+    --spacing-unit: 1.5rem;
+    --max-width: 1200px;
+    --transition-speed: 0.3s;
+    --text-color: #ffffff;
+    --text-muted: rgba(255, 255, 255, 0.7);
+    --border-color: rgba(255, 255, 255, 0.1);
+    --hover-color: rgba(255, 255, 255, 0.9);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html, body {
+    height: 100%;
+    width: 100%;
+    overflow: hidden; /* Prevent scrolling */
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    color: var(--text-color);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    background-color: #000000;
+    touch-action: none;
+}
+
+/* Background Overlay */
+.background-overlay {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.1); /* Slight dark overlay */
+    z-index: -1;
+}
+
+/* Ensure html and body take full viewport height */
+html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+/* Show discord promo only on mobile */
+@media (min-width: 601px) {
+  .discord-promo {
+    display: none !important;
+  }
+}
+@media (max-width: 600px) {
+  .discord-promo {
+    display: block !important;
+  }
+}
+
+/* Logo */
+.logo {
+    position: fixed;
+    top: var(--spacing-unit);
+    left: var(--spacing-unit);
+    z-index: 10;
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Discord Floating Button */
+.discord-float {
+    position: fixed;
+    top: var(--spacing-unit);
+    right: var(--spacing-unit);
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: rgba(25, 28, 36, 0.8);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    padding: 8px 16px;
+    border-radius: 50px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.3s ease;
+}
+
+.discord-text {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 0.8rem;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.discord-button {
+    background: linear-gradient(90deg, #5865f2 0%, #4752c4 100%);
+    color: white !important;
+    font-size: 0.8rem;
+    font-weight: 600;
+    padding: 6px 14px;
+    border-radius: 50px;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.discord-button:hover {
+    background: linear-gradient(90deg, #4752c4 0%, #3a45a5 100%);
+    transform: translateY(-1px);
+    text-decoration: none;
+}
+
+.logo img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+}
+
+/* Main Content */
+main {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: calc(var(--spacing-unit) * 2);
+    z-index: 2;
+}
+
+/* Left Column */
+.left-column {
+    position: fixed;
+    top: 50%;
+    left: 8%;
+    transform: translateY(-50%);
+    max-width: 380px;
+    z-index: 10;
+    width: auto;
+    padding: 1.5rem;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-radius: 6px;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.2);
+    position: relative;
+}
+
+/* Comment Boxes */
+.comment-box {
+    position: absolute;
+    right: -220px;
+    width: 200px;
+    background: rgba(0, 0, 0, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 6px;
+    padding: 10px 12px;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    z-index: 20;
+    opacity: 0.9;
+    transition: all 0.3s ease;
+}
+
+.comment-box:hover {
+    opacity: 1;
+    transform: translateX(4px);
+}
+
+.comment-arrow {
+    position: absolute;
+    left: -8px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 0;
+    height: 0;
+    border-top: 8px solid transparent;
+    border-bottom: 8px solid transparent;
+    border-right: 8px solid rgba(255, 255, 255, 0.1);
+}
+
+.comment-arrow::after {
+    content: '';
+    position: absolute;
+    left: 1px;
+    top: -7px;
+    width: 0;
+    height: 0;
+    border-top: 7px solid transparent;
+    border-bottom: 7px solid transparent;
+    border-right: 7px solid rgba(0, 0, 0, 0.6);
+}
+
+.comment-content {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    font-size: 0.75rem;
+    line-height: 1.4;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.note-emoji {
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+/* Position specific comment boxes */
+.email-comment {
+    top: 160px;
+}
+
+.download-comment {
+    top: 280px;
+}
+
+/* Discord Promo Block */
+.discord-promo {
+    position: fixed;
+    right: 2%;
+    bottom: 0;
+    margin-bottom: 2rem;
+    z-index: 10;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(10px);
+    border-radius: 6px;
+    padding: 0.8rem 1rem;
+    width: 180px;
+    text-align: center;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    display: none; /* Hidden by default */
+}
+
+.discord-content p {
+    color: #fff;
+    margin: 0 0 0.75rem 0;
+    font-size: 0.8rem;
+    line-height: 1.3;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.discord-button {
+    display: block;
+    width: 100%;
+    padding: 0.5rem 0.8rem;
+    background: #5865F2;
+    color: white !important;
+    text-decoration: none;
+    border: none;
+    border-radius: 2px;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    line-height: 1.4;
+}
+
+.discord-button:hover {
+    background: #4752C4;
+    transform: none;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.discord-button:active {
+    transform: translateY(1px);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+/* Responsive adjustments */
+@media (max-width: 1000px) {
+    .comment-box {
+        position: static;
+        width: 100%;
+        margin: 8px 0;
+        right: auto;
+        left: 0;
+    }
+    
+    .comment-arrow {
+        display: none;
+    }
+    
+    .email-comment,
+    .download-comment {
+        top: auto;
+    }
+    
+    .discord-promo {
+        display: none; /* Hide on mobile devices */
+    }
+}
+
+.section {
+    margin-bottom: 0.5rem; /* Reduced from var(--spacing-unit) */
+}
+
+h1 {
+    font-size: 1.8rem;
+    margin: 0 0 0.8rem 0;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #fff;
+    line-height: 1.1;
+    white-space: nowrap;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    position: relative;
+    display: inline-block;
+    padding-bottom: 0.4rem;
+}
+
+h1::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 80px;
+    height: 2px;
+    background: linear-gradient(90deg, rgba(255,255,255,0.8), transparent);
+}
+
+/* Countdown Timer */
+.countdown-timer {
+    margin: 1rem 0 1.6rem 0;
+    font-size: 1rem;
+    color: rgba(255, 255, 255, 0.9);
+    letter-spacing: 0.06em;
+    line-height: 1.3;
+    font-weight: 400;
+}
+
+.countdown-timer #countdown {
+    font-family: 'Inter', monospace;
+    color: #fff;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.countdown-timer #countdown span {
+    display: inline-block;
+    min-width: 2.8em;
+    text-align: left;
+    position: relative;
+    padding: 0 0.2rem;
+}
+
+.countdown-timer .countdown-text {
+    display: block;
+    margin-bottom: 0.4rem;
+    font-size: 1rem;
+    color: rgba(255, 255, 255, 0.8);
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+}
+
+/* Form Elements */
+/* Form Styles */
+.email-form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.9rem;
+    margin: 0 0 1.2rem 0;
+    width: 100%;
+    max-width: 100%;
+}
+
+.form-group {
+    margin-bottom: 0.5rem;
+    position: relative;
+}
+
+.form-group.with-side-note {
+    margin-bottom: 0.75rem;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 0.7rem 0.9rem;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 3px;
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    font-size: 0.9rem;
+    font-family: 'Inter', sans-serif;
+    transition: all 0.2s ease;
+}
+
+/* Form Notes */
+.form-notes {
+    font-size: 0.7rem;
+    color: rgba(255, 255, 255, 0.6);
+    line-height: 1.4;
+    transition: all 0.2s ease;
+    font-weight: 300;
+    letter-spacing: 0.01em;
+}
+
+/* Side note container */
+.with-side-note {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    margin-bottom: 0.75rem;
+}
+
+.form-input-container,
+.button-group-content {
+    flex: 1;
+    min-width: 0;
+}
+
+/* Side note styles */
+.form-notes.side-note {
+    width: 160px;
+    padding: 0.5rem 0;
+    opacity: 0.8;
+    transition: opacity 0.2s ease;
+}
+
+.form-notes.side-note:hover {
+    opacity: 1;
+}
+
+.form-notes .note {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.4rem;
+}
+
+.note-emoji {
+    flex-shrink: 0;
+    margin-top: 0.1rem;
+}
+
+.note-text {
+    font-size: 0.65rem;
+    line-height: 1.3;
+}
+
+/* Adjust button group for side note */
+.button-group.with-side-note {
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+    margin-bottom: 0.5rem;
+}
+
+.button-group-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .form-notes {
+        font-size: 0.7rem;
+    }
+    
+    .form-notes.download-note {
+        text-align: left;
+        padding: 0.6rem 0.8rem;
+    }
+    
+    .form-notes.email-note {
+        padding: 0.6rem;
+    }
+    
+    .form-notes .note-emoji {
+        font-size: 0.8rem;
+    }
+}
+
+.form-notes .note-emoji {
+    margin-right: 0.6rem;
+    font-size: 0.9rem;
+    opacity: 0.8;
+    flex-shrink: 0;
+    margin-top: 0.1rem;
+    transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.form-notes .note-text {
+    flex: 1;
+    font-weight: 300;
+    letter-spacing: 0.02em;
+    text-align: left;
+}
+
+/* Hover effects */
+.form-notes.email-note:hover {
+    background: rgba(255, 255, 255, 0.05);
+    border-left-color: rgba(255, 255, 255, 0.2);
+}
+
+.form-notes.download-note:hover {
+    background: rgba(0, 0, 0, 0.25);
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+.form-notes .note:hover .note-emoji {
+    opacity: 1;
+    transform: scale(1.1);
+}
+
+.form-notes .note-divider {
+    height: 1px;
+    background: rgba(255, 255, 255, 0.1);
+    margin: 0.5rem 0;
+    border: none;
+}
+
+/* Subtle hover effect for notes */
+.form-group:focus-within .form-notes {
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.email-form input[type="text"],
+.email-form input[type="email"] {
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: #fff;
+    padding: 0.8rem 1rem;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.9rem;
+    width: 100%;
+    border-radius: 3px;
+    transition: all 0.3s ease;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.email-form input[type="text"]:focus,
+.email-form input[type="email"]:focus {
+    outline: none;
+    border-color: rgba(255, 255, 255, 0.5);
+    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.1);
+    background: rgba(0, 0, 0, 0.4);
+}
+
+.email-form input[type="text"]::placeholder,
+.email-form input[type="email"]::placeholder {
+    color: var(--text-muted);
+    opacity: 0.7;
+    font-weight: 300;
+    letter-spacing: 0.02em;
+}
+
+/* Button Group */
+.button-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.7rem;
+    width: 100%;
+    margin: 0.5rem 0 0 0;
+    position: relative;
+}
+
+/* Base Button Styles */
+/* Button styles */
+.button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding: 0.7rem 1.25rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.75rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+    overflow: hidden;
+    background: rgba(255, 255, 255, 0.08);
+    color: white;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    line-height: 1.1;
+    margin-bottom: 0.5rem;
+}
+
+.button-icon {
+    margin-right: 8px;
+    font-size: 1.1em;
+    line-height: 1;
+    display: inline-flex;
+    align-items: center;
+}
+
+.button.asher {
+    background: linear-gradient(135deg, rgba(138, 43, 226, 0.15), rgba(75, 0, 130, 0.2));
+    border-color: rgba(138, 43, 226, 0.3);
+}
+
+.button.zero {
+    background: linear-gradient(135deg, rgba(0, 191, 255, 0.15), rgba(0, 0, 139, 0.2));
+    border-color: rgba(0, 191, 255, 0.3);
+}
+
+.button.starter-kit {
+    background: linear-gradient(135deg, rgba(255, 215, 0, 0.15), rgba(255, 140, 0, 0.2));
+    border-color: rgba(255, 215, 0, 0.3);
+    margin-top: 0.5rem;
+    position: relative;
+}
+
+.button:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    background: rgba(255, 255, 255, 0.12);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+.button:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Starter kit button separator */
+.starter-kit-container {
+    position: relative;
+    margin-top: 1rem;
+    padding-top: 1rem;
+}
+
+.starter-kit-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 10%;
+    right: 10%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+}
+
+/* Disabled state for starter kit button */
+.button.starter-kit.disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+.button.starter-kit.disabled::after {
+    content: '🔒';
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 0.9em;
+    opacity: 0.8;
+}
+
+/* Success message */
+.success-message {
+    background: rgba(46, 213, 115, 0.15);
+    color: #2ed573;
+    padding: 0.8rem 1rem;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    margin: 1rem 0;
+    text-align: center;
+    animation: fadeIn 0.3s ease-out;
+    border: 1px solid rgba(46, 213, 115, 0.2);
+    transition: opacity 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-5px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Button Text */
+.button-text {
+    position: relative;
+    z-index: 2;
+}
+
+/* Bass Pack Button */
+.button.bass-pack {
+    background: linear-gradient(135deg, rgba(0, 0, 0, 0.7), rgba(40, 40, 40, 0.7));
+    border-color: rgba(255, 255, 255, 0.2);
+    color: #fff;
+}
+
+/* Drum Pack Button */
+.button.drum-pack {
+    background: linear-gradient(135deg, rgba(20, 20, 20, 0.7), rgba(60, 60, 60, 0.7));
+    border-color: rgba(255, 255, 255, 0.2);
+    color: #fff;
+}
+
+/* Starter Kit Button */
+.button.starter-kit {
+    background: linear-gradient(135deg, rgba(10, 10, 10, 0.8), rgba(30, 30, 30, 0.8));
+    border-color: rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.9);
+    margin-top: 5px;
+}
+
+/* Button Hover Effects */
+.button::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, 
+        rgba(255, 255, 255, 0) 0%, 
+        rgba(255, 255, 255, 0.05) 50%, 
+        rgba(255, 255, 255, 0) 100%);
+    transform: translateX(-100%);
+    transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    pointer-events: none;
+}
+
+/* Bass Pack Hover */
+.button.bass-pack:hover {
+    background: linear-gradient(135deg, rgba(20, 20, 40, 0.8), rgba(40, 40, 70, 0.8));
+    border-color: rgba(100, 150, 255, 0.3);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+/* Drum Pack Hover */
+.button.drum-pack:hover {
+    background: linear-gradient(135deg, rgba(40, 40, 40, 0.9), rgba(70, 70, 70, 0.9));
+    border-color: rgba(255, 255, 255, 0.3);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+/* Starter Kit Hover */
+.button.starter-kit:hover {
+    background: linear-gradient(135deg, rgba(20, 20, 20, 0.9), rgba(40, 40, 40, 0.9));
+    border-color: rgba(255, 255, 255, 0.2);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+}
+
+/* Active State for All Buttons */
+.button:active {
+    transform: translateY(0) !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+    transition: all 0.1s ease !important;
+}
+
+/* Hover Animation for All Buttons */
+.button:hover::before {
+    transform: translateX(100%);
+}
+
+/* Specific button styles */
+.email-form .button {
+    margin-top: 20px;
+}
+
+/* Social links */
+.social-links a {
+    color: var(--text-muted);
+    text-decoration: none;
+    transition: all 0.3s ease;
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    position: relative;
+    padding-bottom: 2px;
+}
+
+.social-links a::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 0;
+    height: 1px;
+    background-color: var(--text-muted);
+    transition: width 0.3s ease;
+}
+
+.social-links a:hover {
+    color: white;
+}
+
+.social-links a:hover::after {
+    width: 100%;
+}
+
+/* Social Links */
+.social-links {
+    font-size: 0.7rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-top: auto;
+    padding-top: var(--spacing-unit);
+    border-top: 1px solid var(--border-color);
+    max-width: 320px;
+}
+
+.social-links a {
+    color: var(--text-muted);
+    text-decoration: none;
+    transition: color var(--transition-speed) ease;
+}
+
+.social-links a:hover {
+    color: var(--hover-color);
+}
+
+.divider {
+    margin: 0 0.5rem;
+    color: var(--text-muted);
+    opacity: 0.5;
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+    main {
+        padding: var(--spacing-unit);
+    }
+    
+    .left-column {
+        width: 100%;
+        margin-top: 80px;
+    }
+    
+    .logo {
+        top: 1rem;
+        left: 1rem;
+        width: 50px;
+        height: 50px;
+    }
+    
+    h1 {
+        font-size: 0.9rem;
+    }
+    
+    .button {
+        font-size: 0.75rem;
+        padding: 0.65rem 1.25rem;
+    }
+    
+    .social-links {
+        font-size: 0.65rem;
+    }
+}
+
+/* Mobile scrollable left-column */
+@media (max-width: 600px) {
+  .left-column {
+    position: relative;
+    margin: 48px auto 0 auto;
+    height: 100vh;
+    max-height: 100vh;
+    width: 75vw;
+    overflow-y: auto;
+    box-sizing: border-box;
+    padding: 16px 8px 60px 8px; /* extra bottom padding for Discord button */
+    border-radius: 0;
+    z-index: 10;
+  }
+  .discord-fixed-mobile {
+    display: none;
+  }
+  @media (max-width: 600px) {
+    .discord-fixed-mobile {
+      display: block;
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      width: 100vw;
+      max-width: 420px;
+      margin: 0 auto 0 auto;
+      z-index: 100;
+      border-radius: 8px 8px 0 0;
+      background: linear-gradient(90deg, #5865f2 60%, #404eed 100%);
+      color: #fff;
+      font-size: 1.13rem;
+      font-weight: 600;
+      text-align: center;
+      padding: 14px 0 14px 0;
+      box-shadow: 0 -2px 16px rgba(0,0,0,0.22);
+      text-decoration: none;
+      border: none;
+      transition: background 0.2s, box-shadow 0.2s;
+      outline: none;
+    }
+    .discord-fixed-mobile:hover, .discord-fixed-mobile:focus {
+      background: linear-gradient(90deg, #404eed 60%, #5865f2 100%);
+      color: #fff;
+      box-shadow: 0 -4px 28px rgba(0,0,0,0.28);
+      text-decoration: none;
+    }
+    .left-column {
+      padding-bottom: 60px;
+    }
+  }
+  .section {
+    padding: 0;
+  }
+  h1 {
+    font-size: 1.3rem;
+  }
+  .button-group button,
+  .button.starter-kit {
+    font-size: 1rem;
+    padding: 10px 8px;
+  }
+}
+
+/* Very small screens */
+@media (max-width: 360px) {
+    .logo {
+        width: 40px;
+        height: 40px;
+    }
+    
+    h1 {
+        font-size: 0.8rem;
+    }
+    
+    .button {
+        font-size: 0.7rem;
+        padding: 0.6rem 1rem;
+    }
+    
+    .social-links {
+        font-size: 0.6rem;
+    }
+}
+
+/* Tally Form Overrides */
+.tally-embed iframe {
+    width: 100% !important;
+    max-width: 480px !important;
+    border: none !important;
+    background: transparent !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+/* Focus States */
+*:focus-visible {
+    outline: 2px solid var(--text-color);
+    outline-offset: 2px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .discord-float {
+        padding: 6px 12px;
+    }
+    
+    .discord-text {
+        display: none; /* Hide text on mobile, only show button */
+    }
+    
+    .discord-button {
+        padding: 6px 12px;
+        font-size: 0.75rem;
+    }
+}
+
+/* Hide focus for mouse users but keep for keyboard navigation */
+*:focus:not(:focus-visible) {
+    outline: none;
+}
+
+/* Hide scrollbars but keep functionality */
+::-webkit-scrollbar {
+    display: none;
+    width: 0;
+    height: 0;
+    background: transparent;
+}

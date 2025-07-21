@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Asher Zero</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="icon" href="AZ-LOGO-GRAY.png" type="image/png">
+    <style>
+        /* Form notes styling will be in the external CSS */
+    </style>
+</head>
+<body style="margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background-color: #000000; background-image: url('images/az-week-1-background-image.png'); background-size: cover; background-position: center; background-repeat: no-repeat;">
+    <!-- Background Overlay -->
+    <div class="background-overlay"></div>
+    
+    <!-- Logo -->
+    <div class="logo">
+        <img src="images/AZ-LOGO-GRAY.png" alt="Asher Zero" width="60" height="60">
+    </div>
+    
+    <!-- Discord Button -->
+    <div class="discord-float">
+        <span class="discord-text">JOIN US ON FRIDAYS!🍾</span>
+        <a href="https://www.discord.gg/x35nHcyVQv" class="discord-button" target="_blank" rel="noopener noreferrer">
+            DISCORD
+        </a>
+    </div>
+    
+    <!-- Main Content -->
+    <main>
+        <!-- Left Column -->
+        <div class="left-column">
+            <!-- Weekly Drop Section -->
+            <div class="section">
+                <h1>AZ WEEK #1 DROP</h1>
+                <div class="countdown-timer">
+                    <span class="countdown-text">Available for </span>
+                    <span id="countdown">
+                        <span id="days">0d</span> 
+                        <span id="hours">0h</span> 
+                        <span id="minutes">0m</span> 
+                        <span id="seconds">0s</span>
+                    </span>
+                </div>
+                <div class="tally-form">
+                    <form class="email-form" action="https://formspree.io/f/xvgrjvja" method="POST">
+                        <input type="hidden" name="_captcha" value="false">
+                        <div class="form-group">
+                            <input type="text" name="name" placeholder="Artist Name" required>
+                        </div>
+                        <div class="form-group">
+                            <div class="form-input-container">
+                                <input type="email" name="email" placeholder="Artist Email" required>
+                            </div>
+                        </div>
+                        <div class="comment-box email-comment">
+                            <div class="comment-arrow"></div>
+                            <div class="comment-content">
+                                <span class="note-emoji">🤞</span>
+                                <span class="note-text">ultra super pinky promise we wont sell ur email. We just wanna know who's here!</span>
+                            </div>
+                        </div>
+                        <div class="button-group">
+                            <button type="button" class="button asher" name="pack" value="asher-bass" aria-label="Download ASHER BASS 'WEIGHT' PACK">
+                                <span class="button-icon">ASHER BASS 'WEIGHT' PACK</span>
+                            </button>
+                            <button type="button" class="button zero" name="pack" value="zero-drum" aria-label="Download ZERO DRUM 'WEIGHT' PACK">
+                                <span class="button-icon">ZERO DRUM 'WEIGHT' PACK</span>
+                            </button>
+                        </div>
+                        <div class="comment-box download-comment">
+                            <div class="comment-arrow"></div>
+                            <div class="comment-content">
+                                <span class="note-emoji">⬇️</span>
+                                <span class="note-text">when u input ur email It's gonna auto download, no need to go anywhere.</span>
+                            </div>
+                        </div>
+                        <div class="button-group">
+                            <button type="button" class="button starter-kit" name="pack" value="starter-kit" aria-label="Download STARTER KIT">
+                                <span class="button-icon">🎁 DOWNLOAD STARTER KIT</span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Success message will appear here after form submission -->
+            <div id="download-message" class="success-message" style="display: none;" aria-live="polite">
+                Your download should start shortly. If it doesn't, please check your email.
+            </div>
+        </div>
+        
+        <!-- Social Links -->
+        <div class="social-links">
+            <a href="https://www.instagram.com/asher.zero/" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
+                Instagram
+            </a>
+        </div>
+    </main>
+    
+    <!-- Scripts -->
+    <script src="https://tally.so/widgets/embed.js"></script>
+        <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const form = document.querySelector('.email-form');
+            const packButtons = form.querySelectorAll('button[name="pack"]');
+            const downloadMessage = document.getElementById('download-message');
+
+            packButtons.forEach((button) => {
+                button.addEventListener('click', async (e) => {
+                    e.preventDefault();
+                    const packType = button.value;
+
+                    const nameInput = form.querySelector('input[name="name"]');
+                    const emailInput = form.querySelector('input[name="email"]');
+                    const name = nameInput.value.trim();
+                    const email = emailInput.value.trim();
+                    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+                    // Validate name/email
+                    if (!name || !email) {
+                        downloadMessage.textContent = 'Please enter your name and email.';
+                        downloadMessage.style.display = 'block';
+                        downloadMessage.style.opacity = '1';
+                        return;
+                    }
+                    if (!emailRegex.test(email)) {
+                        downloadMessage.textContent = 'Please enter a valid email address.';
+                        downloadMessage.style.display = 'block';
+                        downloadMessage.style.opacity = '1';
+                        return;
+                    }
+
+                    // Send data to Formspree via AJAX
+                    try {
+                        await fetch(form.action, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                            body: JSON.stringify({ name, email, pack: packType })
+                        });
+                    } catch (err) {
+                        // Ignore error, still allow download
+                    }
+
+                    // Trigger download (user-initiated)
+                    let fileName = '';
+                    if (packType === 'asher-bass') {
+                        fileName = '@AZ_ASHR_BASS."WEIGHT".zip';
+                    } else if (packType === 'zero-drum') {
+                        fileName = '@AZ_ZERO_DRUM."WEIGHT".zip';
+                    } else if (packType === 'starter-kit') {
+                        fileName = '@AZ_STARTER-KIT.zip';
+                    }
+                    if (fileName) {
+                        // Trigger download
+                        window.location.href = `downloads/${fileName}`;
+                        downloadMessage.textContent = 'Your download should start shortly. If it doesn\'t, please check your email.';
+                        downloadMessage.style.display = 'block';
+                        downloadMessage.style.opacity = '1';
+                    } else {
+                        downloadMessage.textContent = 'Error: Download file not found.';
+                        downloadMessage.style.display = 'block';
+                        downloadMessage.style.opacity = '1';
+                    }
+
+                    // Hide message after 5 seconds
+                    setTimeout(() => {
+                        downloadMessage.style.opacity = '0';
+                        setTimeout(() => {
+                            downloadMessage.style.display = 'none';
+                        }, 300);
+                    }, 5000);
+                });
+            });
+
+            // Remove the default submit event handler to prevent accidental fallback
+            form.addEventListener('submit', (event) => { event.preventDefault(); });
+        });
+</script>
+<script>
+// Countdown to next Friday at 12:00 PM CST (UTC-6, or UTC-5 during daylight saving)
+function getNextFridayNoonCST(now) {
+    // Convert 'now' to UTC
+    const utc = new Date(now.getTime() + now.getTimezoneOffset() * 60000);
+    // CST is UTC-6, but in summer CDT is UTC-5. We'll use US Central Time (Chicago) rules.
+    // Use Intl API for robust conversion.
+    const central = new Date(utc.toLocaleString('en-US', { timeZone: 'America/Chicago' }));
+    let target = new Date(central);
+    // 5 = Friday
+    const day = target.getDay();
+    const hour = target.getHours();
+    // Days until next Friday
+    let daysUntilFriday = (5 - day + 7) % 7;
+    // If today is Friday and past noon, go to next week
+    if (day === 5 && hour >= 12) daysUntilFriday = 7;
+    target.setDate(target.getDate() + daysUntilFriday);
+    target.setHours(12, 0, 0, 0); // 12:00 PM
+    // Convert back to UTC
+    const targetUTC = new Date(target.getTime() - target.getTimezoneOffset() * 60000);
+    return targetUTC;
+}
+function updateCountdown() {
+    const now = new Date();
+    const target = getNextFridayNoonCST(now);
+    const diff = target - now;
+    if (diff <= 0) {
+        document.getElementById('countdown').innerHTML = 'Available now!';
+        return;
+    }
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+    document.getElementById('days').textContent = days + 'd ';
+    document.getElementById('hours').textContent = hours + 'h ';
+    document.getElementById('minutes').textContent = minutes + 'm ';
+    document.getElementById('seconds').textContent = seconds + 's';
+}
+updateCountdown();
+setInterval(updateCountdown, 1000);
+</script>
+
+
+</body>
+</html>
