@@ -109,6 +109,11 @@
             const form = document.querySelector('.email-form');
             const packButtons = form.querySelectorAll('button[name="pack"]');
             const downloadMessage = document.getElementById('download-message');
+            
+            // Check if browser is Safari
+            const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+            // Check if browser is iOS
+            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
 
             packButtons.forEach((button) => {
                 button.addEventListener('click', async (e) => {
@@ -156,9 +161,28 @@
                         fileName = '@AZ_STARTER-KIT.zip';
                     }
                     if (fileName) {
-                        // Trigger download
-                        window.location.href = `downloads/${fileName}`;
-                        downloadMessage.textContent = 'Your download should start shortly. If it doesn\'t, please check your email.';
+                        const fileUrl = `downloads/${encodeURIComponent(fileName)}`;
+                        
+                        // Handle Safari/iOS differently
+                        if (isSafari || isIOS) {
+                            // For Safari/iOS, we need to open in a new tab
+                            window.open(fileUrl, '_blank');
+                            downloadMessage.textContent = 'Your download has started in a new tab. If it doesn\'t work, please try again.';
+                        } else {
+                            // For other browsers, use the download attribute
+                            const link = document.createElement('a');
+                            link.href = fileUrl;
+                            link.download = fileName;
+                            link.style.display = 'none';
+                            document.body.appendChild(link);
+                            link.click();
+                            setTimeout(() => {
+                                document.body.removeChild(link);
+                                window.URL.revokeObjectURL(fileUrl);
+                            }, 100);
+                            downloadMessage.textContent = 'Your download should start shortly. If it doesn\'t, please check your email.';
+                        }
+                        
                         downloadMessage.style.display = 'block';
                         downloadMessage.style.opacity = '1';
                     } else {
