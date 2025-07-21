@@ -65,10 +65,10 @@
                             </div>
                         </div>
                         <div class="button-group">
-                            <button type="button" class="button asher" name="pack" value="asher-bass" aria-label="Download ASHER BASS 'WEIGHT' PACK">
+                            <button type="button" class="button asher" name="pack" value="AZ_ASHR_BASS.WEIGHT" aria-label="Download AZ_ASHR_BASS.WEIGHT">
                                 <span class="button-icon">ASHER BASS 'WEIGHT' PACK</span>
                             </button>
-                            <button type="button" class="button zero" name="pack" value="zero-drum" aria-label="Download ZERO DRUM 'WEIGHT' PACK">
+                            <button type="button" class="button zero" name="pack" value="AZ_ZERO_DRUM.WEIGHT" aria-label="Download AZ_ZERO_DRUM_WEIGHT">
                                 <span class="button-icon">ZERO DRUM 'WEIGHT' PACK</span>
                             </button>
                         </div>
@@ -80,7 +80,7 @@
                             </div>
                         </div>
                         <div class="button-group">
-                            <button type="button" class="button starter-kit" name="pack" value="starter-kit" aria-label="Download STARTER KIT">
+                            <button type="button" class="button starter-kit" name="pack" value="AZ_STARTER-KIT" aria-label="Download AZ_STARTER-KIT">
                                 <span class="button-icon">🎁 DOWNLOAD STARTER KIT</span>
                             </button>
                         </div>
@@ -115,105 +115,74 @@
             // Check if browser is iOS
             const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
 
+            const fileMappings = {
+                'AZ_ASHR_BASS.WEIGHT': {
+                    file: 'AZ_ASHR_BASS.WEIGHT.zip',
+                    display: 'AZ_ASHR_BASS.WEIGHT_PACK'
+                },
+                'AZ_ZERO_DRUM.WEIGHT': {
+                    file: 'AZ_ZERO_DRUM.WEIGHT.zip',
+                    display: 'AZ_ZERO_DRUM.WEIGHT_PACK'
+                },
+                'AZ_STARTER-KIT': {
+                    file: 'AZ_STARTER-KIT.zip',
+                    display: 'AZ_STARTER-KIT'
+                }
+            };
+            
             packButtons.forEach((button) => {
-                button.addEventListener('click', async (e) => {
+                button.addEventListener('click', (e) => {
                     e.preventDefault();
-                    const packType = button.value;
 
+                    const packType = button.value;
                     const nameInput = form.querySelector('input[name="name"]');
                     const emailInput = form.querySelector('input[name="email"]');
                     const name = nameInput.value.trim();
                     const email = emailInput.value.trim();
                     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-                    // Validate name/email
-                    if (!name || !email) {
-                        downloadMessage.textContent = 'Please enter your name and email.';
-                        downloadMessage.style.display = 'block';
-                        downloadMessage.style.opacity = '1';
-                        return;
-                    }
-                    if (!emailRegex.test(email)) {
-                        downloadMessage.textContent = 'Please enter a valid email address.';
+                    if (!name || !email || !emailRegex.test(email)) {
+                        downloadMessage.textContent = 'Please enter a valid name and email.';
                         downloadMessage.style.display = 'block';
                         downloadMessage.style.opacity = '1';
                         return;
                     }
 
-                    // Send data to Formspree via AJAX
-                    try {
-                        await fetch(form.action, {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-                            body: JSON.stringify({ name, email, pack: packType })
-                        });
-                    } catch (err) {
-                        // Ignore error, still allow download
-                    }
-
-                    // Trigger download (user-initiated)
-                    let fileName = '';
-                    let displayName = '';
-                    
-                    // Define file mappings
-                    const fileMappings = {
-                        'asher-bass': {
-                            file: 'AZ_ASHR_BASS_WEIGHT.zip',
-                            display: 'ASHR BASS "WEIGHT" PACK'
-                        },
-                        'zero-drum': {
-                            file: 'AZ_ZERO_DRUM_WEIGHT.zip',
-                            display: 'ZERO DRUM "WEIGHT" PACK'
-                        },
-                        'starter-kit': {
-                            file: 'AZ_STARTER-KIT.zip',
-                            display: 'STARTER KIT'
-                        }
-                    };
-                    
                     const fileInfo = fileMappings[packType];
-                    
                     if (fileInfo) {
-                        fileName = fileInfo.file;
-                        displayName = fileInfo.display;
-                        
-                        // Create the full URL to the file
-                        const fileUrl = `downloads/${fileName}`;
-                        
-                        // Create a temporary link for the download
-                        const link = document.createElement('a');
-                        link.href = fileUrl;
-                        link.download = displayName + '.zip';
-                        link.style.display = 'none';
-                        document.body.appendChild(link);
-                        
-                        // Try to trigger the download
-                        try {
-                            link.click();
-                            downloadMessage.textContent = 'Starting download...';
-                        } catch (err) {
-                            // If download fails, open in new tab as fallback
+                        const fileUrl = `downloads/${fileInfo.file}`;
+
+                        if (isSafari || isIOS) {
+                            // Safari fallback: open in new tab
                             window.open(fileUrl, '_blank');
-                            downloadMessage.textContent = 'Opening download in new tab...';
-                        }
-                        
-                        // Clean up
-                        setTimeout(() => {
+                            downloadMessage.textContent = 'Your download opened in a new tab (Safari fallback). If it didn’t start, tap and hold the link to download.';
+                        } else {
+                            // Standard download trigger
+                            const link = document.createElement('a');
+                            link.href = fileUrl;
+                            link.download = fileInfo.display + '.zip';
+                            document.body.appendChild(link);
+                            link.click();
                             document.body.removeChild(link);
-                            window.URL.revokeObjectURL(fileUrl);
-                        }, 100);
-                        
-                        downloadMessage.textContent = 'Your download should start shortly. If it doesn\'t, please check your email.';
-                        
-                        downloadMessage.style.display = 'block';
-                        downloadMessage.style.opacity = '1';
-                    } else {
-                        downloadMessage.textContent = 'Error: Download file not found.';
+                            downloadMessage.textContent = 'Your download should start shortly.';
+                        }
+
                         downloadMessage.style.display = 'block';
                         downloadMessage.style.opacity = '1';
                     }
 
-                    // Hide message after 5 seconds
+                    fetch(form.action, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                        body: JSON.stringify({ name, email, pack: packType })
+                    }).catch(() => {});
+
+                    if (!(isSafari || isIOS)) {
+                        downloadMessage.textContent = 'Your download should start shortly.';
+                        downloadMessage.style.display = 'block';
+                        downloadMessage.style.opacity = '1';
+                    }
+
                     setTimeout(() => {
                         downloadMessage.style.opacity = '0';
                         setTimeout(() => {
