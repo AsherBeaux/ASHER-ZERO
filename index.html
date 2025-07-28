@@ -22,7 +22,7 @@
         /* Form notes styling will be in the external CSS */
     </style>
 </head>
-<body style="margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background-color: #000000; background-image: url('images/az-week-1-background-image.png'); background-size: cover; background-position: center; background-repeat: no-repeat;">
+<body style="margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background-color: #000000; background-image: url('images/az-week-2-background-image.png'); background-size: cover; background-position: center; background-repeat: no-repeat;">
     <!-- Background Overlay -->
     <div class="background-overlay"></div>
     
@@ -45,7 +45,7 @@
         <div class="left-column">
             <!-- Weekly Drop Section -->
             <div class="section">
-                <h1>AZ WEEK #1 DROP</h1>
+                <h1>AZ WEEK #2 DROP</h1>
                 <div class="countdown-timer">
                     <span class="countdown-text">Available for </span>
                     <span id="countdown">
@@ -74,10 +74,10 @@
                             </div>
                         </div>
                         <div class="button-group">
-                            <button type="button" class="button asher" name="pack" value="AZ_ASHR_BASS.WEIGHT" aria-label="Download AZ_ASHR_BASS.WEIGHT">
+                            <button type="button" class="button asher" name="pack" value="AZ_ASHR_BASS.WEIGHT.2" aria-label="Download AZ_ASHR_BASS.WEIGHT.2">
                                 <span class="button-icon">ASHER BASS 'WEIGHT' PACK</span>
                             </button>
-                            <button type="button" class="button zero" name="pack" value="AZ_ZERO_DRUM.WEIGHT" aria-label="Download AZ_ZERO_DRUM_WEIGHT">
+                            <button type="button" class="button zero" name="pack" value="AZ_ZERO_DRUM.WEIGHT.2" aria-label="Download AZ_ZERO_DRUM_WEIGHT.2">
                                 <span class="button-icon">ZERO DRUM 'WEIGHT' PACK</span>
                             </button>
                         </div>
@@ -125,12 +125,12 @@
             const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
 
             const fileMappings = {
-                'AZ_ASHR_BASS.WEIGHT': {
-                    file: 'AZ_ASHR_BASS.WEIGHT.zip',
+                'AZ_ASHR_BASS.WEIGHT.2': {
+                    file: 'AZ_ASHR_BASS.WEIGHT.2.zip',
                     display: 'AZ_ASHR_BASS.WEIGHT_PACK'
                 },
-                'AZ_ZERO_DRUM.WEIGHT': {
-                    file: 'AZ_ZERO_DRUM.WEIGHT.zip',
+                'AZ_ZERO_DRUM.WEIGHT.2': {
+                    file: 'AZ_ZERO_DRUM.WEIGHT.2.zip',
                     display: 'AZ_ZERO_DRUM.WEIGHT_PACK'
                 },
                 'AZ_STARTER-KIT': {
@@ -206,22 +206,28 @@
         });
 </script>
 <script>
-// Countdown to next Friday at 12:00 PM CST (UTC-6, or UTC-5 during daylight saving)
-function getNextFridayNoonCST(now) {
+// Countdown to next Monday at 12:00 PM CST (UTC-6, or UTC-5 during daylight saving)
+function getNextMondayNoonCST(now) {
     // Convert 'now' to UTC
     const utc = new Date(now.getTime() + now.getTimezoneOffset() * 60000);
     // CST is UTC-6, but in summer CDT is UTC-5. We'll use US Central Time (Chicago) rules.
     // Use Intl API for robust conversion.
     const central = new Date(utc.toLocaleString('en-US', { timeZone: 'America/Chicago' }));
     let target = new Date(central);
-    // 5 = Friday
+    // 1 = Monday
     const day = target.getDay();
     const hour = target.getHours();
-    // Days until next Friday
-    let daysUntilFriday = (5 - day + 7) % 7;
-    // If today is Friday and past noon, go to next week
-    if (day === 5 && hour >= 12) daysUntilFriday = 7;
-    target.setDate(target.getDate() + daysUntilFriday);
+    // Days until next Monday
+    let daysUntilMonday = (1 - day + 7) % 7;
+    // If today is Monday and before noon, use today, otherwise next Monday
+    if (day === 1) {
+        if (hour < 12) {
+            daysUntilMonday = 0; // Today is Monday before noon
+        } else {
+            daysUntilMonday = 7; // Next Monday
+        }
+    }
+    target.setDate(target.getDate() + daysUntilMonday);
     target.setHours(12, 0, 0, 0); // 12:00 PM
     // Convert back to UTC
     const targetUTC = new Date(target.getTime() - target.getTimezoneOffset() * 60000);
@@ -229,7 +235,7 @@ function getNextFridayNoonCST(now) {
 }
 function updateCountdown() {
     const now = new Date();
-    const target = getNextFridayNoonCST(now);
+    const target = getNextMondayNoonCST(now);
     const diff = target - now;
     if (diff <= 0) {
         document.getElementById('countdown').innerHTML = 'Available now!';
