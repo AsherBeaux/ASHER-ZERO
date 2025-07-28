@@ -206,36 +206,43 @@
         });
 </script>
 <script>
-// Countdown to next Monday at 12:00 PM CST (UTC-6, or UTC-5 during daylight saving)
-function getNextMondayNoonCST(now) {
-    // Convert 'now' to UTC
-    const utc = new Date(now.getTime() + now.getTimezoneOffset() * 60000);
-    // CST is UTC-6, but in summer CDT is UTC-5. We'll use US Central Time (Chicago) rules.
-    // Use Intl API for robust conversion.
-    const central = new Date(utc.toLocaleString('en-US', { timeZone: 'America/Chicago' }));
+// Countdown to next Monday at 12:00 AM CDT (UTC-5 during daylight saving)
+function getNextMondayMidnightCDT(now) {
+    // Convert 'now' to Central Time (handles both CST and CDT)
+    const central = new Date(now.toLocaleString('en-US', { timeZone: 'America/Chicago' }));
     let target = new Date(central);
+    
     // 1 = Monday
     const day = target.getDay();
-    const hour = target.getHours();
-    // Days until next Monday
+    const hours = target.getHours();
+    
+    // Calculate days until next Monday
     let daysUntilMonday = (1 - day + 7) % 7;
-    // If today is Monday and before noon, use today, otherwise next Monday
-    if (day === 1) {
-        if (hour < 12) {
-            daysUntilMonday = 0; // Today is Monday before noon
-        } else {
-            daysUntilMonday = 7; // Next Monday
+    
+    // If it's Sunday, check if we're past midnight
+    if (day === 0) {
+        if (hours >= 0) { // If it's Sunday at any time, next Monday is tomorrow
+            daysUntilMonday = 1;
         }
     }
+    // If it's Monday, check if we're before midnight
+    else if (day === 1) {
+        if (hours >= 0) { // If it's Monday at any time, go to next Monday
+            daysUntilMonday = 7;
+        }
+    }
+    
+    // Set to next Monday at 12:00 AM
     target.setDate(target.getDate() + daysUntilMonday);
-    target.setHours(12, 0, 0, 0); // 12:00 PM
-    // Convert back to UTC
-    const targetUTC = new Date(target.getTime() - target.getTimezoneOffset() * 60000);
-    return targetUTC;
+    target.setHours(0, 0, 0, 0); // 12:00 AM (midnight)
+    
+    // Convert back to local time for countdown calculations
+    const targetLocal = new Date(target.toLocaleString('en-US', { timeZone: 'America/Chicago' }));
+    return targetLocal;
 }
 function updateCountdown() {
     const now = new Date();
-    const target = getNextMondayNoonCST(now);
+    const target = getNextMondayMidnightCDT(now);
     const diff = target - now;
     if (diff <= 0) {
         document.getElementById('countdown').innerHTML = 'Available now!';
